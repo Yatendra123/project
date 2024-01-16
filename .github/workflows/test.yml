@@ -10,4 +10,6 @@ on:
           - SmokeTest
           - FeatureFile
           - FullTest
-
+      featureFile:
+        description: 'Enter the path with Name of featureFile'
+        required: true
