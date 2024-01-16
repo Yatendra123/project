@@ -1,0 +1,13 @@
+name: Testing
+
+on:
+  workflow_dispatch:
+    inputs:
+      testType:
+        type: choice
+        description: 'select the test to run'
+        options:
+          - SmokeTest
+          - FeatureFile
+          - FullTest
+
