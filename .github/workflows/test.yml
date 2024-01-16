@@ -1,6 +1,12 @@
 name: Testing
 
 on:
+  pull_request:
+    types: [ opened, synchronize, reopened, edited ]
+    branches:
+      - master
+      - Cryptography
+      - Notepad
   workflow_dispatch:
     inputs:
       testType:
@@ -11,5 +17,5 @@ on:
           - FeatureFile
           - FullTest
       featureFile:
-        description: 'Enter the path with Name of featureFile'
-        required: true
+        description: 'Enter the featureFile when select the FeatureFIle'
+        required: false
