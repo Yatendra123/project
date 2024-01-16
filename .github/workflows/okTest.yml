@@ -1,0 +1,106 @@
+name: RunSmokeAndFullApiTest
+
+on:
+
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+    branches:
+      - master
+      - version-17-MT
+      - wf-v17
+
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Choose the stage'
+        required: true
+        default: 'wf-v17'
+        type: choice
+        options:
+          - 'FeatureFile'
+          - 'SmokeTest'
+          - 'FullTest'
+
+  workflow_call:
+
+env:
+  BE_INTEGRATION_TEST_USER           : "astmt_dsuser_v17.donotdelete@mailinator.com"
+  BE_SECONDARY_INTEGRATION_TEST_USER : "astmt_ds_user_2_v17.donotdelete@mailinator.com"
+  CS_BASE_URL                        : "https://hdctest-cs-astmt.cloud.pcftest.com"
+  DS_BASE_URL                        : "https://hdctest-ds-astmt.cloud.pcftest.com"
+  HSDP_CONFIG                        : '{"DC_MESSAGING_SERVICE":{"API_VERSION":"2","PROPOSITION_ID":"uGrow","URL":"https://hdc-servicesmock-astmt.cloud.pcftest.com/deviceCloud"},"DC_PAIRING":{"API_VERSION":"1","URL":"https://stg.ps.dc1.philips.com/PSRequestHandler/pairing"},"PH_SERVICES":{"API_VERSION":"1","APPLICATION_NAME":"DataCore","AUTH":{"URL":"https://user-registration-assembly-testing.us-east.philips-healthsuite.com"},"PROPOSITION_NAME":"DataCoreInternal"}}'
+  HSDP_PH_APPLICATION_NAME           : "DataCore"
+  HSDP_PH_PROPOSITION_NAME           : "DataCoreInternal"
+  HSDP_PH_AUTH_BASE_URL              : "https://user-registration-assembly-testing.us-east.philips-healthsuite.com"
+  HSDP_API_VERSION                   : "1"
+  HSDP_DC_PAIRING_BASE_URL           : "https://stg.ps.dc1.philips.com/PSRequestHandler/pairing"
+  SS_BASE_URL                        : "https://hdctest-ss-astmt.cloud.pcftest.com"
+  SS_MT_BASE_URL                     : "https://hdctest-ss-astmt.cloud.pcftest.com"
+  CSS_BASE_URL                       : "https://hdc-css-astmt.cloud.pcftest.com"
+  SERVICES_MOCK_URL                  : "https://hdc-servicesmock-astmt.cloud.pcftest.com"
+  NS_BASE_URL                        : "https://hdc-ns-astmt.cloud.pcftest.com"
+  HSS_GW_URL                         : "https://hdctest-hss-ds-astmt.cloud.pcftest.com"
+  REGION                             : "useast"
+  CQ5_BASE_URL                       : "https://hdc-servicesmock-astmt.cloud.pcftest.com/cq5"
+  HOST_HSDP_IAM                      : "https://iam-client-test.eu-west.philips-healthsuite.com"
+  ENABLE_COACHING                    : "true"
+  WIREMOCK_URL                       : "https://hdc-wiremock-astmt.cloud.pcftest.com"
+  VAULT_ROLE_ID                      :  ${{ secrets.CS_VAULT_ROLE_ID }}
+  VAULT_SECRET_ID                    :  ${{ secrets.CS_VAULT_SECRET_ID }}
+  VAULT_SECRETS_PATH                 :  ${{ secrets.CS_VAULT_SECRET_PATH_GUID }}
+  VAULT_HOST_URL                     : "https://vproxy.us-east.philips-healthsuite.com"
+  HSDP_TENANT_ID                     : "71cec0f9-86e7-49cf-a60e-80727f9e230b"
+
+jobs:
+  RunSmokeAndFullApiTest:
+    name: Datacore api test
+    runs-on: [self-hosted,linux,X64,philips-code-hub]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17 for x64
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          server-id: platform-pkgs-web-snapshot-local
+          settings-path: ${{ github.workspace }}
+
+      - name: Install Cloud Foundry CLI
+        run: |
+          wget -q -O - https://packages.cloudfoundry.org/debian/cli.cloudfoundry.org.key | sudo apt-key add -
+          echo "deb https://packages.cloudfoundry.org/debian stable main" | sudo tee /etc/apt/sources.list.d/cloudfoundry-cli.list
+          sudo apt-get update
+          sudo apt-get install cf7-cli
+          cf version
+
+      - name: Login to CF
+        run: |
+          cf login -a https://api.cloud.pcftest.com -u ${{ secrets.CF_USERNAME }} -p ${{ secrets.CF_PASSWORD }} -o 'Horizontal Data Core' -s ASTMT
+
+      - name: CF Apps Start
+        run: |
+          cf apps | tail +5 | cut -d ' ' -f 1 |  xargs -n 1 cf start
+
+      - name: Run smoke test
+        if: ${{ github.event_name != 'repository_dispatch' }}
+        run: |
+          echo "Starting Smoke test execution for api-version:17"
+          # mvn -fae -B clean install integration-test failsafe:verify -PCI -D"cucumber.filter.tags=@datacorev17 and not @ignore and @smoketest and not @tenant" 
+
+      - name: Run Feature File
+        if: ${{ github.event.inputs.test_type }} == "FeatureFile"
+        run: |
+          echo "Starting test execution for feature file ${github.event.inputs.feature_file}"
+          # mvn -fae -B clean install integration-test failsafe:verify -PCI  -D"cucumber.filter.tags=not @tenant" -Dcucumber.features="src/test/resources/${github.event.inputs.feature_file}"
+
+      - name: Run full test
+        run: |
+          echo "Starting Full test execution"
+          mvn -fae -B clean install integration-test failsafe:verify -PCI -D"cucumber.filter.tags=@datacorev17 and not @ignore and not @obetest and not @tenant"
+
+      - name: stop the CF apps
+        run: |
+          cf apps | tail +5 | cut -d ' ' -f 1 |  xargs -n 1 cf stop
