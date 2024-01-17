@@ -1,9 +1,19 @@
-name: Github Actions test
-on: [push]
-env: 
-	ENV_VARIABLE: ok
-jobs:
-	test:
-		runs-on: ubuntu-latest
-		steps:
-			- run: echo "$ENV_VARIABLE"
+name: 'RunSmokeAndFullApiTest for HDC v17'
+
+on:
+
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Choose the stage'
+        required: true
+        default: 'version-17-MT'
+        type: choice
+        options:
+          - 'FeatureFile'
+          - 'SmokeTest'
+          - 'FullTest'
+          
+      featureFile:
+        description: 'Enter the feature file'
+        required: false
