@@ -2,14 +2,3 @@ name: Testing for different branch
 
 on:
   workflow_dispatch:
-    inputs:
-      testType:
-        type: choice
-        description: 'select the test to run'
-        options:
-          - SmokeTest
-          - FeatureFile
-          - FullTest
-      featureFile:
-        description: 'Enter the featureFile when select the FeatureFIle'
-        required: false
