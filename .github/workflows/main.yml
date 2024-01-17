@@ -16,4 +16,7 @@ on:
           - 'SmokeTest'
           - 'FullTest'
 
-      
+jobs:
+  RunSmokeAndFullApiTest:
+    name: Datacore api test ${{github.branches}}
+    runs-on: [self-hosted,linux,X64]
