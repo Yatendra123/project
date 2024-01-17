@@ -1,4 +1,4 @@
-name: 'RunSmokeAndFullApiTest for HDC v17'
+name: 'RunSmokeAndFullApiTest for HDC v17 demo'
 
 on:
 
