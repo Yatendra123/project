@@ -1,4 +1,4 @@
-name: Testing for different branch
+name: OKTEST
 
 on:
   workflow_dispatch:
