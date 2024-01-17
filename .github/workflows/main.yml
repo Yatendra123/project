@@ -1,0 +1,14 @@
+name: RunSmokeAndFullApiTest
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_type:
+        type: choice
+        description: Choose the stage
+        options:
+        - SmokeTest
+        - FullTest
+
+  repository_dispatch:
+    types: [trigger-apitest]
