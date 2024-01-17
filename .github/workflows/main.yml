@@ -22,4 +22,7 @@ jobs:
    test:
       runs-on: ubuntu-latest
       steps:
-          - run: echo ${{github.event.inputs.build_type}}
+      - name: Run Feature File
+        if: ${{ github.event.inputs.build_type }} == "FeatureFile"
+        run: |
+          echo "Starting test execution for feature file"
