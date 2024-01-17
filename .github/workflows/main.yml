@@ -25,4 +25,4 @@ jobs:
       - name: Run Feature File
         if: ${{ github.event.inputs.build_type }} == 'FeatureFile'
         run: |
-          echo "Starting test execution for feature file ${{ github.event.inputs.featureFile }}"
+          echo "Starting test execution for feature file ${{ github.event.inputs.build_type }}"
