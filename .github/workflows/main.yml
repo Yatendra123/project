@@ -22,4 +22,4 @@ jobs:
    test:
       runs-on: ubuntu-latest
       steps:
-          - run: echo ${github.event.inputs.build_type}
+          - run: echo ${{github.event.inputs.build_type}}
