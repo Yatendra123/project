@@ -7,4 +7,6 @@ jobs:
    test:
       runs-on: ubuntu-latest
       steps:
-          - run: echo $ENV_VARIABLE
+       - name: Run the IF statement
+         if: $ENV_VARIABLE == 'kok'
+         run: echo $ENV_VARIABLE
