@@ -1,14 +1,9 @@
-name: RunSmokeAndFullApiTest
-
-on:
-  workflow_dispatch:
-    inputs:
-      test_type:
-        type: choice
-        description: Choose the stage
-        options:
-        - SmokeTest
-        - FullTest
-
-  repository_dispatch:
-    types: [trigger-apitest]
+name: Github Actions test
+on: [push]
+env: 
+	ENV_VARIABLE: ok
+jobs:
+	test:
+		runs-on: ubuntu-latest
+		steps:
+			- run: echo "$ENV_VARIABLE"
