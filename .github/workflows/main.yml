@@ -1,8 +1,19 @@
-name: RunAPITestCases
+name: RunSmokeAndFullApiTest
 
 on:
+
   workflow_dispatch:
+    branches:
+      - '*'
     inputs:
-      branches:
-        - '*'
+      build_type:
+        description: 'Choose the stage'
+        required: true
+        default: 'wf-v17'
+        type: choice
+        options:
+          - 'FeatureFile'
+          - 'SmokeTest'
+          - 'FullTest'
+
       
