@@ -28,4 +28,5 @@ jobs:
 
       - name: clone the repository
         run: |
-          git clone https://github.com/philips-internal/HSP_PS_hdc-cloud-api-test.git
+          #!/bin/bash
+          git clone https://\${{ secrets.GH_USER }}:\${{ secrets.GH_PWD }}@github.com/philips-internal/HSP_PS_is-test-result-tfs-uploader.git is-test-result-tfs-uploader  
